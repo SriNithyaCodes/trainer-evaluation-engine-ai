@@ -8,7 +8,7 @@ class GroqService:
         # Using Llama 3 for fast, high-quality reasoning
         self.model = "llama-3.3-70b-versatile"
 
-    async def analyze_session(self, transcript: string):
+    async def analyze_session(self, transcript: str):
         prompt = f"""
         Evaluate this trainer session transcript for clarity, engagement, and confidence.
         Return ONLY valid JSON.
@@ -26,7 +26,7 @@ class GroqService:
         )
         return json.loads(response.choices[0].message.content)
 
-    async def classify_trainer_dna(self, transcript: string):
+    async def classify_trainer_dna(self, transcript: str):
         response = self.client.chat.completions.create(
             messages=[
                 {"role": "system", "content": "Classify the trainer into one of these types: Motivator, Storyteller, Technical Expert, Interactive Coach, Fast Lecturer. Return JSON with: dna_type, primary_traits (list)."},
@@ -37,7 +37,7 @@ class GroqService:
         )
         return json.loads(response.choices[0].message.content)
 
-    async def generate_sentiment_heatmap(self, transcript: string):
+    async def generate_sentiment_heatmap(self, transcript: str):
         response = self.client.chat.completions.create(
             messages=[
                 {"role": "system", "content": "Generate a sentiment timeline for the session. Return JSON with a list of 'data' points, each having: time (string), sentiment (float -1 to 1), emotion (string)."},
@@ -48,7 +48,7 @@ class GroqService:
         )
         return json.loads(response.choices[0].message.content)
 
-    async def predict_growth(self, session_history_summary: string):
+    async def predict_growth(self, session_history_summary: str):
         response = self.client.chat.completions.create(
             messages=[
                 {"role": "system", "content": "Predict trainer growth and burnout. Return JSON with: future_score (0-100), burnout_risk (0-100), growth_probability (0-100), reason (string)."},
@@ -59,7 +59,7 @@ class GroqService:
         )
         return json.loads(response.choices[0].message.content)
 
-    async def generate_7day_roadmap(self, last_analysis: string):
+    async def generate_7day_roadmap(self, last_analysis: str):
         response = self.client.chat.completions.create(
             messages=[
                 {"role": "system", "content": "Create a 7-day improvement roadmap. Return JSON with a list 'roadmap', each item having: day (int), focus (string), task (string)."},
