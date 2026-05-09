@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from ..models.models import Trainer, Session as SessionModel, AIAnalysis, Prediction, FeedbackReport, SentimentData
 from ..schemas.schemas import TrainerCreate, SessionCreate
-from ..ai.gemini_service import gemini_service
+from ..ai.groq_service import groq_service
 
 class TrainerService:
     @staticmethod
@@ -27,19 +27,19 @@ class TrainerService:
             return None
 
         # 1. Session Autopsy
-        analysis_data = await gemini_service.analyze_session(session.transcript)
+        analysis_data = await groq_service.analyze_session(session.transcript)
         db_analysis = AIAnalysis(session_id=session_id, **analysis_data)
         db.add(db_analysis)
 
         # 2. Sentiment Timeline
-        sentiment_points = await gemini_service.generate_sentiment_timeline(session.transcript)
-        for point in sentiment_points:
+        sentiment_data = await groq_service.generate_sentiment_heatmap(session.transcript)
+        for point in sentiment_data.get('data', []):
             db_sentiment = SentimentData(session_id=session_id, **point)
             db.add(db_sentiment)
 
         # 3. Trainer DNA (if not set or update)
-        dna_type = await gemini_service.classify_trainer_dna(session.transcript)
-        session.trainer.dna_type = dna_type
+        dna_info = await groq_service.classify_trainer_dna(session.transcript)
+        session.trainer.dna_type = dna_info.get('dna_type', 'Unknown')
 
         db.commit()
         return db_analysis
@@ -48,7 +48,7 @@ class TrainerService:
     async def predict_growth(db: Session, trainer_id: int):
         trainer = db.query(Trainer).filter(Trainer.id == trainer_id).first()
         history = f"Trainer: {trainer.trainer_name}, Specialization: {trainer.specialization}"
-        prediction_data = await gemini_service.predict_trainer_growth(history)
+        prediction_data = await groq_service.predict_growth(history)
         
         db_prediction = Prediction(trainer_id=trainer_id, **prediction_data)
         db.add(db_prediction)
@@ -59,7 +59,7 @@ class TrainerService:
     @staticmethod
     async def generate_roadmap(db: Session, trainer_id: int):
         trainer = db.query(Trainer).filter(Trainer.id == trainer_id).first()
-        roadmap_data = await gemini_service.generate_improvement_roadmap(f"{trainer.trainer_name} in {trainer.department}")
+        roadmap_data = await groq_service.generate_7day_roadmap(f"{trainer.trainer_name} in {trainer.department}")
         
         db_report = FeedbackReport(trainer_id=trainer_id, **roadmap_data)
         db.add(db_report)

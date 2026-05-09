@@ -1,166 +1,78 @@
-import { GoogleGenAI, Type } from "@google/genai";
+/**
+ * Groq AI Service — Client-side implementation
+ * (Calls Groq API directly using the key from process.env.GROQ_API_KEY)
+ */
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY as string });
+const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
+const MODEL = "llama-3.3-70b-versatile";
+
+const groqFetch = async (messages: any[], system: string) => {
+  if (!GROQ_API_KEY) {
+    console.error("GROQ_API_KEY is not set!");
+    throw new Error("API Key missing");
+  }
+
+  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${GROQ_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      messages: [
+        { role: "system", content: system },
+        ...messages
+      ],
+      response_format: { type: "json_object" }
+    })
+  });
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error?.message || "Groq API error");
+  return JSON.parse(data.choices[0].message.content);
+};
 
 export const GeminiService = {
   async analyzeSession(transcript: string) {
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: [
-        {
-          text: `Evaluate this trainer session transcript. Return JSON.
-          Transcript: ${transcript}`,
-        },
-      ],
-      config: {
-        systemInstruction: "You are an advanced AI trainer evaluation system. Evaluate communication, engagement, confidence, depth, effectiveness, interaction, pacing, energy, filler words, and impact. Provide scores (0-100), strengths, weaknesses, suggestions, and personality traits. Format: JSON.",
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            clarityScore: { type: Type.NUMBER },
-            engagementScore: { type: Type.NUMBER },
-            confidenceScore: { type: Type.NUMBER },
-            pacingScore: { type: Type.NUMBER },
-            energyLevel: { type: Type.NUMBER },
-            strengths: { type: Type.ARRAY, items: { type: Type.STRING } },
-            weaknesses: { type: Type.ARRAY, items: { type: Type.STRING } },
-            suggestions: { type: Type.ARRAY, items: { type: Type.STRING } },
-            personalityTraits: { type: Type.ARRAY, items: { type: Type.STRING } },
-            fillerWordAnalysis: { type: Type.STRING }
-          }
-        }
-      },
-    });
-    return JSON.parse(response.text);
+    return groqFetch(
+      [{ role: "user", content: `Evaluate this trainer session: ${transcript}` }],
+      "You are an advanced AI trainer evaluation system. Evaluate communication, engagement, confidence, depth, effectiveness, interaction, pacing, energy. Return JSON with scores (0-100), strengths, weaknesses, suggestions, and personality traits."
+    );
   },
 
   async analyzeSentiment(transcript: string) {
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: [
-        {
-          text: `Analyze emotional engagement and sentiment heatmap. Return JSON.
-          Transcript: ${transcript}`,
-        },
-      ],
-      config: {
-        systemInstruction: "Identify engagement spikes, confusion, boredom, excitement, and drops. Return a sentiment timeline and emotional score. Format: JSON.",
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            emotionalScore: { type: Type.NUMBER },
-            timeline: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  timestamp: { type: Type.NUMBER, description: "Seconds from start" },
-                  sentiment: { type: Type.STRING, enum: ["excited", "neutral", "confused", "bored"] },
-                  intensity: { type: Type.NUMBER }
-                }
-              }
-            }
-          }
-        }
-      },
-    });
-    return JSON.parse(response.text);
+    return groqFetch(
+      [{ role: "user", content: `Analyze emotional engagement heatmap: ${transcript}` }],
+      "Identify engagement spikes, confusion, boredom, excitement. Return JSON with emotionalScore and a timeline array (timestamp, sentiment, intensity)."
+    );
   },
 
   async generateTrainerDNA(sessionsData: any[]) {
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: [
-        {
-          text: `Generate Trainer DNA fingerprint based on these session results: ${JSON.stringify(sessionsData)}`,
-        },
-      ],
-      config: {
-        systemInstruction: "Classify teaching personality, communication style, and blind spots. Types: Motivator, Storyteller, Technical Expert, Interactive Coach, Fast Lecturer. Format: JSON.",
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            dnaType: { type: Type.STRING },
-            communicationStyle: { type: Type.STRING },
-            primaryStrengths: { type: Type.ARRAY, items: { type: Type.STRING } },
-            blindSpots: { type: Type.ARRAY, items: { type: Type.STRING } }
-          }
-        }
-      },
-    });
-    return JSON.parse(response.text);
+    return groqFetch(
+      [{ role: "user", content: `Generate Trainer DNA fingerprint: ${JSON.stringify(sessionsData)}` }],
+      "Classify teaching personality. Types: Motivator, Storyteller, Technical Expert, Interactive Coach, Fast Lecturer. Return JSON with dnaType, communicationStyle, primaryStrengths, blindSpots."
+    );
   },
 
   async predictPerformance(history: any[]) {
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: [{ text: `Predict future trainer performance: ${JSON.stringify(history)}` }],
-      config: {
-        systemInstruction: "Predict future scores, burnout risk, and growth trends. Format: JSON.",
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            futureScore: { type: Type.NUMBER },
-            burnoutRisk: { type: Type.NUMBER },
-            growthProbability: { type: Type.NUMBER },
-            forecast: { type: Type.STRING }
-          }
-        }
-      }
-    });
-    return JSON.parse(response.text);
+    return groqFetch(
+      [{ role: "user", content: `Predict future performance: ${JSON.stringify(history)}` }],
+      "Predict future scores, burnout risk, and growth trends. Return JSON with futureScore, burnoutRisk, growthProbability, forecast."
+    );
   },
 
   async generateRoadmap(analysis: any) {
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: [{ text: `Generate 7-day improvement roadmap: ${JSON.stringify(analysis)}` }],
-      config: {
-        systemInstruction: "Create daily tasks focused on communication, pacing, and confidence. Format: JSON.",
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            days: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  day: { type: Type.NUMBER },
-                  focus: { type: Type.STRING },
-                  task: { type: Type.STRING }
-                }
-              }
-            }
-          }
-        }
-      }
-    });
-    return JSON.parse(response.text);
+    return groqFetch(
+      [{ role: "user", content: `Generate 7-day roadmap: ${JSON.stringify(analysis)}` }],
+      "Create daily tasks focused on communication, pacing, and confidence. Return JSON with a 'days' array (day, focus, task)."
+    );
   },
 
   async getLiveCoPilotTip(transcriptSnippet: string) {
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: [{ text: `Provide real-time co-pilot tip for: ${transcriptSnippet}` }],
-      config: {
-        systemInstruction: "Detect speaking speed, energy, or silence issues. Provide a short, actionable tip. Format: JSON.",
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            alertType: { type: Type.STRING },
-            tip: { type: Type.STRING },
-            priority: { type: Type.STRING, enum: ["low", "medium", "high"] }
-          }
-        }
-      }
-    });
-    return JSON.parse(response.text);
+    return groqFetch(
+      [{ role: "user", content: `Live tip for: ${transcriptSnippet}` }],
+      "Provide a short, actionable coaching tip. Return JSON with alertType, tip, priority (low/medium/high)."
+    );
   }
 };
-
