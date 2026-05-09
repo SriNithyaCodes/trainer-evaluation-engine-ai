@@ -103,6 +103,33 @@ export const generateRoadmap = (trainerId: number) =>
     headers: getHeaders(),
   }).then(handle);
 
+// New AI Operating System Features
+export const simulateStudent = (data: { persona: string; message: string; context?: string }) =>
+  fetch(`${BASE_URL}/ai/simulate`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(data),
+  }).then(handle);
+
+export const getReputation = (trainerId: number) =>
+  fetch(`${BASE_URL}/ai/reputation/${trainerId}`, {
+    method: 'POST',
+    headers: getHeaders(),
+  }).then(handle);
+
+export const runEngagementReplay = (sessionId: number) =>
+  fetch(`${BASE_URL}/ai/replay/${sessionId}`, {
+    method: 'POST',
+    headers: getHeaders(),
+  }).then(handle);
+
+export const updateAIModel = (modelId: string) =>
+  fetch(`${BASE_URL}/ai/settings/model`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(modelId),
+  }).then(handle);
+
 // ─── Dashboard ───────────────────────────────────────────────────────────────
 
 export const getDashboardStats = () =>
