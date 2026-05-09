@@ -35,9 +35,9 @@ export default function SessionAutopsy() {
 
   return (
     <div className="space-y-8 pb-20 font-sans">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Session Autopsy</h1>
-        <p className="text-slate-500 text-sm">Deep AI analysis of trainer performance and communication DNA.</p>
+      <header className="flex flex-col gap-2">
+        <h1 className="text-4xl lg:text-6xl font-black tracking-[-0.05em] text-slate-900 uppercase italic">Session <span className="text-brand-primary">Autopsy</span>.</h1>
+        <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em]">Deep AI analysis of trainer performance and communication DNA.</p>
       </header>
 
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">

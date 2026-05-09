@@ -1,6 +1,7 @@
 import os
 import shutil
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, BackgroundTasks
+from ..agents.orchestrator import orchestrator
 from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models.models import Session as SessionModel
@@ -11,6 +12,7 @@ router = APIRouter(prefix="/sessions", tags=["Sessions"])
 
 @router.post("/upload", response_model=SessionResponse)
 async def upload_session(
+    background_tasks: BackgroundTasks,
     trainer_id: int = Form(...),
     session_title: str = Form(...),
     duration: int = Form(...),
@@ -36,6 +38,10 @@ async def upload_session(
     db.add(new_session)
     db.commit()
     db.refresh(new_session)
+
+    # TRIGGER AUTONOMOUS AGENT ECOSYSTEM
+    background_tasks.add_task(orchestrator.trigger_session_workflow, new_session.id, db)
+
     return new_session
 
 @router.get("/{id}", response_model=SessionResponse)

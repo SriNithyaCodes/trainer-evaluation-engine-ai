@@ -10,6 +10,10 @@ import asyncio
 # Initialize Database
 Base.metadata.create_all(bind=engine)
 
+# Seed Initial Data
+from .seed import seed_data
+seed_data()
+
 app = FastAPI(title=settings.PROJECT_NAME, version="1.0.0")
 
 # CORS Middleware

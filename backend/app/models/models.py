@@ -93,3 +93,21 @@ class FeedbackReport(Base):
     improvement_plan = Column(JSON) # 7-day roadmap
 
     trainer = relationship("Trainer", back_populates="feedback_reports")
+
+class AIAgentActivity(Base):
+    __tablename__ = "ai_agent_activity"
+
+    id = Column(Integer, primary_key=True, index=True)
+    agent_name = Column(String) # e.g., Session Intelligence Agent
+    status = Column(String) # THINKING, ANALYZING, COMPLETED, IDLE
+    message = Column(String)
+    data = Column(JSON, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class AIAgentSettings(Base):
+    __tablename__ = "ai_agent_settings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    active_model = Column(String, default="llama-3.3-70b-versatile")
+    token_usage_total = Column(Integer, default=0)
+    avg_response_time = Column(Float, default=0.0)

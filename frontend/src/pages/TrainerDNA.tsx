@@ -25,9 +25,9 @@ export default function TrainerDNA() {
 
   return (
     <div className="space-y-8 pb-20 font-sans">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Trainer DNA</h1>
-        <p className="text-slate-500 text-sm">Your unique teaching intelligence fingerprint and personality classification.</p>
+      <header className="flex flex-col gap-2">
+        <h1 className="text-4xl lg:text-6xl font-black tracking-[-0.05em] text-slate-900 uppercase italic">Trainer <span className="text-brand-primary">DNA</span>.</h1>
+        <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em]">Your unique teaching intelligence fingerprint and personality classification.</p>
       </header>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
@@ -53,7 +53,7 @@ export default function TrainerDNA() {
         </div>
 
         <div className="pro-panel p-8 xl:col-span-2">
-          <h3 className="text-xl font-bold text-slate-900 mb-8 px-4">Intelligence Spectrum</h3>
+          <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-12 px-4">Intelligence Spectrum</h3>
           <div className="h-[400px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart cx="50%" cy="50%" outerRadius="80%" data={dnaData}>
@@ -76,7 +76,7 @@ export default function TrainerDNA() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <DNAFactor 
           icon={Zap} 
-          title="Core Strengths" 
+          title="CORE STRENGTHS" 
           items={[
             "Deep technical fluency",
             "Structured logical flow",
@@ -86,7 +86,7 @@ export default function TrainerDNA() {
         />
         <DNAFactor 
           icon={ShieldAlert} 
-          title="Growth Areas" 
+          title="GROWTH AREAS" 
           items={[
             "Lower emotional resonance",
             "Potential pacing density",
@@ -96,7 +96,7 @@ export default function TrainerDNA() {
         />
         <DNAFactor 
           icon={Rocket} 
-          title="Growth Path" 
+          title="GROWTH PATH" 
           items={[
             "Implement empathetic hooks",
             "Vary rhythmic pacing",
@@ -130,7 +130,7 @@ function DNAFactor({ icon: Icon, title, items, color }: any) {
         <Icon className="w-6 h-6" />
       </div>
       <div>
-        <h4 className="text-lg font-bold text-slate-900 mb-6">{title}</h4>
+        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-6">{title}</h4>
         <ul className="space-y-4">
           {items.map((item: string, i: number) => (
             <li key={i} className="flex items-start gap-3 text-sm text-slate-500 group-hover:text-slate-700 transition-colors">

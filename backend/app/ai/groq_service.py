@@ -5,12 +5,16 @@ from ..config import settings
 class GroqService:
     def __init__(self):
         self.client = Groq(api_key=settings.GROQ_API_KEY)
-        # Using Llama 3 for fast, high-quality reasoning
+        # Default model, can be overridden dynamically
         self.model = "llama-3.3-70b-versatile"
+
+    def set_model(self, model_name: str):
+        self.model = model_name
 
     async def analyze_session(self, transcript: str):
         prompt = f"""
         Evaluate this trainer session transcript for clarity, engagement, and confidence.
+        Support multilingual analysis (English, Telugu, Hindi).
         Return ONLY valid JSON.
         
         Transcript: {transcript}
@@ -37,10 +41,55 @@ class GroqService:
         )
         return json.loads(response.choices[0].message.content)
 
+    async def simulate_student(self, persona: str, message: str, context: str = ""):
+        """AI Mock Student Simulator logic"""
+        personas = {
+            "confused": "a confused student who doesn't understand technical terms and asks for simple analogies.",
+            "advanced": "an advanced learner who asks deep, challenging questions to test the trainer's expertise.",
+            "distracted": "a distracted learner who is bored and needs engagement to stay focused.",
+            "weak": "a weak learner who struggles with basic concepts and needs slow explanations."
+        }
+        
+        selected_persona = personas.get(persona, personas["confused"])
+        
+        response = self.client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": f"You are {selected_persona} in a classroom. Respond to the trainer's statement. Keep it brief and realistic. Return JSON with: response (string), confusion_level (0-100), engagement_level (0-100)."},
+                {"role": "user", "content": f"Context: {context}\nTrainer says: {message}"}
+            ],
+            model=self.model,
+            response_format={"type": "json_object"}
+        )
+        return json.loads(response.choices[0].message.content)
+
+    async def analyze_reputation(self, trainer_history: str):
+        """Trainer Reputation Engine"""
+        response = self.client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": "Analyze trainer reputation based on history. Return JSON with: trust_score, loyalty_score, consistency_index, communication_quality_score, badges (list of strings), milestones (list of strings)."},
+                {"role": "user", "content": f"History: {trainer_history}"}
+            ],
+            model=self.model,
+            response_format={"type": "json_object"}
+        )
+        return json.loads(response.choices[0].message.content)
+
+    async def engagement_replay_analysis(self, transcript: str):
+        """AI Engagement Replay analysis"""
+        response = self.client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": "Analyze transcript for engagement spikes and drops. Return JSON with a list 'moments', each having: timestamp (string), type ('spike' or 'drop'), reason (string), intensity (0-100). Also include 'filler_words' (dict of counts)."},
+                {"role": "user", "content": f"Analyze: {transcript}"}
+            ],
+            model=self.model,
+            response_format={"type": "json_object"}
+        )
+        return json.loads(response.choices[0].message.content)
+
     async def generate_sentiment_heatmap(self, transcript: str):
         response = self.client.chat.completions.create(
             messages=[
-                {"role": "system", "content": "Generate a sentiment timeline for the session. Return JSON with a list of 'data' points, each having: time (string), sentiment (float -1 to 1), emotion (string)."},
+                {"role": "system", "content": "Generate a sentiment timeline for the session. Support multilingual (English, Telugu, Hindi). Return JSON with a list of 'data' points, each having: time (string), sentiment (float -1 to 1), emotion (string)."},
                 {"role": "user", "content": f"Analyze: {transcript}"}
             ],
             model=self.model,
@@ -71,3 +120,4 @@ class GroqService:
         return json.loads(response.choices[0].message.content)
 
 groq_service = GroqService()
+

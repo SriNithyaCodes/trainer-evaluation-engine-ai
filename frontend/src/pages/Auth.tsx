@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Mail, Lock, User, Building, BrainCircuit, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, Building, BrainCircuit, ArrowRight, Loader2, Shield } from 'lucide-react';
 import { login, signup } from '../services/api';
 
 export default function Auth() {
@@ -10,7 +10,6 @@ export default function Auth() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // Form state
   const [form, setForm] = useState({
     full_name: '',
     email: '',
@@ -39,7 +38,7 @@ export default function Auth() {
       }
       navigate('/dashboard');
     } catch (err: any) {
-      // Allow demo access if backend is not running
+      // Allow demo access
       localStorage.setItem('traiq_user', JSON.stringify({ name: form.full_name || 'Demo User', role: 'Admin' }));
       navigate('/dashboard');
     } finally {
@@ -48,73 +47,90 @@ export default function Auth() {
   };
 
   const inputClass =
-    'w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-slate-900 text-sm placeholder:text-slate-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all';
+    'w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white text-sm placeholder:text-slate-500 outline-none focus:border-brand-primary/50 focus:bg-white/10 transition-all';
 
   return (
-    <div className="min-h-screen bg-white flex">
+    <div className="min-h-screen bg-bg-deep flex font-poppins selection:bg-brand-primary/30 selection:text-black">
+      {/* Background Decor */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-brand-primary/10 blur-[150px] animate-orb"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-brand-secondary/10 blur-[150px] animate-orb" style={{ animationDelay: '-4s' }}></div>
+      </div>
+
       {/* Left Panel — Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 to-blue-800 flex-col justify-between p-16">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-            <BrainCircuit className="w-6 h-6 text-white" />
+      <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-20 overflow-hidden border-r border-white/5">
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/5 via-brand-secondary/5 to-transparent"></div>
+        
+        <div className="flex items-center gap-4 relative z-10">
+          <div className="w-12 h-12 rounded-xl bg-black border border-white/10 flex items-center justify-center">
+            <BrainCircuit className="w-7 h-7 text-brand-primary" />
           </div>
-          <span className="font-bold text-xl text-white tracking-tight">TrainerIQ X</span>
+          <div className="flex flex-col">
+            <span className="font-extrabold text-2xl tracking-tighter text-white leading-none">TRAINER<span className="text-brand-primary">IQ</span></span>
+            <span className="text-[10px] font-bold text-brand-secondary tracking-[0.3em] uppercase">Operating System</span>
+          </div>
         </div>
 
-        <div className="space-y-6">
-          <h1 className="text-5xl font-bold text-white leading-tight">
-            The AI brain for<br />
-            <span className="text-blue-200">human trainers.</span>
-          </h1>
-          <p className="text-blue-200 text-lg leading-relaxed max-w-md">
-            Analyze sessions, decode teaching DNA, predict growth, and coach in real-time — all powered by Gemini Pro.
+        <div className="space-y-8 relative z-10">
+          <motion.h1 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-7xl font-black text-white leading-[0.9] tracking-tighter"
+          >
+            Access <br />
+            The <span className="ai-glow-text">Neural</span> <br />
+            Network.
+          </motion.h1>
+          <p className="text-slate-400 text-xl font-medium max-w-md leading-relaxed">
+            The next generation of trainer intelligence is here. Log in to deploy your AI copilot.
           </p>
-          <div className="flex flex-wrap gap-3 pt-4">
-            {['Session Autopsy', 'Trainer DNA', 'Sentiment AI', 'Burnout Prediction'].map((tag) => (
-              <span key={tag} className="px-4 py-1.5 bg-white/10 backdrop-blur rounded-full text-xs font-bold text-white uppercase tracking-wider">
+          <div className="flex flex-wrap gap-4">
+            {['Llama 3.3', 'Sentiment AI', 'Reputation Index', 'Live Replay'].map((tag) => (
+              <span key={tag} className="px-5 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] font-black text-slate-300 uppercase tracking-widest">
                 {tag}
               </span>
             ))}
           </div>
         </div>
 
-        <p className="text-blue-300 text-sm">© 2026 TrainerIQ X — AI Operating System</p>
+        <div className="flex items-center gap-4 relative z-10 opacity-40">
+           <Shield className="w-4 h-4 text-brand-primary" />
+           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">End-to-End Neural Encryption Active</p>
+        </div>
       </div>
 
       {/* Right Panel — Form */}
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-8 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-md glass-panel p-10"
         >
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-2 mb-10">
-            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center">
-              <BrainCircuit className="w-5 h-5 text-white" />
+          <div className="lg:hidden flex items-center gap-3 mb-10">
+            <div className="w-10 h-10 rounded-xl bg-black border border-white/10 flex items-center justify-center">
+              <BrainCircuit className="w-6 h-6 text-brand-primary" />
             </div>
-            <span className="font-bold text-xl text-slate-900">TrainerIQ X</span>
+            <span className="font-extrabold text-2xl text-white tracking-tighter leading-none">TRAINER<span className="text-brand-primary">IQ</span></span>
           </div>
 
-          <h2 className="text-3xl font-bold text-slate-900 mb-2">
-            {isLogin ? 'Welcome back' : 'Create account'}
+          <h2 className="text-3xl font-black text-white mb-2 tracking-tight italic">
+            {isLogin ? 'SYSTEM AUTH' : 'CREATE NODE'}
           </h2>
-          <p className="text-slate-500 text-sm mb-8">
-            {isLogin
-              ? 'Sign in to your AI command center.'
-              : 'Join the next generation of intelligent training.'}
+          <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-10">
+            {isLogin ? 'Enter your credentials to proceed.' : 'Initialize your trainer intelligence node.'}
           </p>
 
           {/* Toggle */}
-          <div className="flex bg-slate-100 rounded-xl p-1 mb-8">
-            {['Sign In', 'Join Platform'].map((label, i) => (
+          <div className="flex bg-white/5 border border-white/10 rounded-2xl p-1 mb-10">
+            {['Access', 'Initialize'].map((label, i) => (
               <button
                 key={label}
                 onClick={() => { setIsLogin(i === 0); setError(''); }}
-                className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
+                className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl transition-all ${
                   isLogin === (i === 0)
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-brand-primary text-black shadow-lg shadow-brand-primary/20'
+                    : 'text-slate-500 hover:text-white'
                 }`}
               >
                 {label}
@@ -122,31 +138,31 @@ export default function Auth() {
             ))}
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <AnimatePresence>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <AnimatePresence mode="wait">
               {!isLogin && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="space-y-4 overflow-hidden"
+                  className="space-y-6 overflow-hidden"
                 >
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                     <input
                       required
                       className={inputClass}
-                      placeholder="Full Name"
+                      placeholder="FULL NAME"
                       value={form.full_name}
                       onChange={(e) => set('full_name', e.target.value)}
                     />
                   </div>
                   <div className="relative">
-                    <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                     <input
                       required
                       className={inputClass}
-                      placeholder="Organization"
+                      placeholder="ORGANIZATION"
                       value={form.organization}
                       onChange={(e) => set('organization', e.target.value)}
                     />
@@ -156,31 +172,31 @@ export default function Auth() {
             </AnimatePresence>
 
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
               <input
                 type="email"
                 required
                 className={inputClass}
-                placeholder="Email address"
+                placeholder="EMAIL ADDRESS"
                 value={form.email}
                 onChange={(e) => set('email', e.target.value)}
               />
             </div>
 
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
               <input
                 type="password"
                 required
                 className={inputClass}
-                placeholder="Password"
+                placeholder="PASSWORD"
                 value={form.password}
                 onChange={(e) => set('password', e.target.value)}
               />
             </div>
 
             {error && (
-              <p className="text-red-500 text-sm bg-red-50 border border-red-100 rounded-lg px-4 py-3">
+              <p className="text-brand-accent text-xs font-bold uppercase tracking-widest bg-brand-accent/10 border border-brand-accent/20 rounded-xl px-4 py-3">
                 {error}
               </p>
             )}
@@ -188,26 +204,25 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full btn-primary flex items-center justify-center gap-2 py-3.5 mt-2"
+              className="w-full btn-nextgen flex items-center justify-center gap-3 py-4 mt-4 text-xs font-black uppercase tracking-[0.3em]"
             >
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
-                  {isLogin ? 'Access System' : 'Create Account'}
+                  {isLogin ? 'Deploy Access' : 'Initialize Node'}
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          <p className="text-center text-xs text-slate-400 mt-8">
-            By continuing, you agree to TrainerIQ X's{' '}
-            <a href="#" className="text-blue-600 hover:underline">Terms</a> and{' '}
-            <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>.
+          <p className="text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-10">
+            Secured by <span className="text-brand-primary">NeuralLock™</span> v3.0
           </p>
         </motion.div>
       </div>
     </div>
   );
 }
+

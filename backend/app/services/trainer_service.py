@@ -67,4 +67,9 @@ class TrainerService:
         db.refresh(db_report)
         return db_report
 
+    @staticmethod
+    def get_session(db: Session, session_id: int):
+        return db.query(SessionModel).filter(SessionModel.id == session_id).first()
+
 trainer_service = TrainerService()
+
