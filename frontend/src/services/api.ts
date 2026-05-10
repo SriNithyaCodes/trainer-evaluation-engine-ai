@@ -3,7 +3,7 @@
  * Connects the React frontend to the FastAPI backend at localhost:8000
  */
 
-const BASE_URL = import.meta.env.VITE_API_URL || '';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 // Grab token from localStorage (set on login)
 const getHeaders = (): HeadersInit => {
@@ -137,3 +137,66 @@ export const getDashboardStats = () =>
 
 export const getLeaderboard = () =>
   fetch(`${BASE_URL}/dashboard/leaderboard`, { headers: getHeaders() }).then(handle);
+
+// ─── Requirements ────────────────────────────────────────────────────────────
+
+export const analyzeRequirement = (data: any) =>
+  fetch(`${BASE_URL}/requirement/analyze`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(data),
+  }).then(handle);
+
+// ─── Adaptive Friction Form ──────────────────────────────────────────────────
+
+export const generateForm = (subject: string, trainerType: string) =>
+  fetch(`${BASE_URL}/form/generate?subject=${encodeURIComponent(subject)}&trainer_type=${encodeURIComponent(trainerType)}`, {
+    method: 'POST',
+    headers: getHeaders(),
+  }).then(handle);
+
+export const submitAnswer = (data: { form_id: string; question_id: string; answer: string; behavior_metrics: any }) =>
+  fetch(`${BASE_URL}/form/submit-answer`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(data),
+  }).then(handle);
+
+export const getFormSignals = (formId: string) =>
+  fetch(`${BASE_URL}/form/${formId}/signals`, { headers: getHeaders() }).then(handle);
+
+export const getFormState = (formId: string) =>
+  fetch(`${BASE_URL}/form/${formId}/state`, { headers: getHeaders() }).then(handle);
+
+// ─── AI Evaluation Intelligence ──────────────────────────────────────────────
+
+export const analyzeEvaluation = (formData: FormData) =>
+  fetch(`${BASE_URL}/evaluation/analyze`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${localStorage.getItem('traiq_token') || ''}` },
+    body: formData,
+  }).then(handle);
+
+// ─── AI Authenticity Intelligence ───────────────────────────────────────────
+
+export const analyzeAuthenticity = (formData: FormData) =>
+  fetch(`${BASE_URL}/authenticity/analyze`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${localStorage.getItem('traiq_token') || ''}` },
+    body: formData,
+  }).then(handle);
+
+// ─── Diagnostic Teaching Intelligence ───────────────────────────────────────
+
+export const generateDiagnosticScenario = (subject: string, difficulty: string) =>
+  fetch(`${BASE_URL}/diagnostic/generate-scenario?subject=${subject}&difficulty=${difficulty}`, {
+    method: 'POST',
+    headers: getHeaders(),
+  }).then(handle);
+
+export const evaluateDiagnosticResponse = (response: any) =>
+  fetch(`${BASE_URL}/diagnostic/evaluate`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(response),
+  }).then(handle);

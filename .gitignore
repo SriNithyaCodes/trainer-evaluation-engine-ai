@@ -1,12 +1,38 @@
 # Dependencies
 node_modules/
+venv/
+env/
+.venv/
+.env/
 
 # Build folders
 build/
 dist/
+out/
 
 # Coverage reports
 coverage/
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database
+*.db
+*.sqlite3
 
 # Environment files
 .env
@@ -27,6 +53,7 @@ yarn-error.log*
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Vite files
 .vite/
@@ -34,6 +61,8 @@ Thumbs.db
 # IDE files
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # Temporary files
 *.tmp

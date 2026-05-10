@@ -119,5 +119,77 @@ class GroqService:
         )
         return json.loads(response.choices[0].message.content)
 
+    async def analyze_requirement(self, req_data: dict):
+        """Analyze trainer hiring requirement using AI."""
+        prompt = f"""
+        Analyze the following trainer hiring requirement and generate a comprehensive evaluation blueprint.
+        Requirement Data:
+        - Subject: {req_data.get('subject')}
+        - Duration: {req_data.get('duration')} hours
+        - Budget: ₹{req_data.get('budget')}
+        - Delivery Mode: {req_data.get('delivery_mode')}
+        - Batch Size: {req_data.get('batch_size')}
+        - Project Component: {req_data.get('project_type')}
+        - Topics Covered: {req_data.get('topics')}
+        - Experience Preference: {req_data.get('experience_preference')} years
+
+        Return ONLY valid JSON with the following structure:
+        {{
+            "derived_skills": [
+                {{"skill": "Skill Name", "score": 0-100}}
+            ],
+            "difficulty": {{
+                "level": "Easy/Medium/Advanced/Expert",
+                "score": 0-100,
+                "reasoning": "Detailed explanation"
+            }},
+            "trainer_persona": {{
+                "type": "e.g., Interactive Technical Mentor",
+                "personality": "...",
+                "communication_style": "...",
+                "engagement_behavior": "..."
+            }},
+            "capability_mapping": [
+                {{
+                    "capability": "Patience/Deep Scenario Response/AI Stance/Diagnostic Teaching/Concept Simplification",
+                    "importance": "...",
+                    "what_to_test": "...",
+                    "recommended_method": "..."
+                }}
+            ],
+            "evaluation_tasks": [
+                {{
+                    "title": "...",
+                    "mapped_capability": "...",
+                    "objective": "...",
+                    "difficulty": "Easy/Medium/Hard"
+                }}
+            ],
+            "risks": [
+                {{
+                    "risk": "...",
+                    "mitigation": "..."
+                }}
+            ],
+            "timeline": [
+                {{"step": "Requirement Received", "status": "completed"}},
+                {{"step": "Topics Analyzed", "status": "completed"}},
+                {{"step": "Capabilities Derived", "status": "completed"}},
+                {{"step": "Difficulty Calculated", "status": "completed"}},
+                {{"step": "Tasks Generated", "status": "completed"}}
+            ]
+        }}
+        """
+        
+        response = self.client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": "You are the Impexus CPS-01 AI Requirement Intelligence Engine. Your goal is to transform trainer hiring requirements into professional evaluation blueprints. Focus on technical depth, teaching quality, and behavioral capabilities."},
+                {"role": "user", "content": prompt}
+            ],
+            model=self.model,
+            response_format={"type": "json_object"}
+        )
+        return json.loads(response.choices[0].message.content)
+
 groq_service = GroqService()
 
