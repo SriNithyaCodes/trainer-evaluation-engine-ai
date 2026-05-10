@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Mail, Lock, User, Building, BrainCircuit, ArrowRight, Loader2, Shield } from 'lucide-react';
 import { login, signup } from '../services/api';
@@ -61,15 +61,15 @@ export default function Auth() {
       <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-24 overflow-hidden border-r border-slate-100 bg-white">
         <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/5 via-brand-secondary/5 to-transparent"></div>
         
-        <div className="flex items-center gap-5 relative z-10">
-          <div className="w-14 h-14 rounded-2xl bg-black border border-slate-100 flex items-center justify-center shadow-2xl">
+        <Link to="/" className="flex items-center gap-5 relative z-10 group cursor-pointer">
+          <div className="w-14 h-14 rounded-2xl bg-black border border-slate-100 flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300">
             <BrainCircuit className="w-8 h-8 text-brand-primary" />
           </div>
           <div className="flex flex-col">
-            <span className="font-black text-3xl tracking-tighter text-slate-900 leading-none uppercase italic">TRAINER<span className="text-brand-primary">IQ</span></span>
+            <span className="font-black text-3xl tracking-tighter text-slate-900 leading-none uppercase italic group-hover:text-brand-primary transition-colors duration-300">TRAINER<span className="text-brand-primary">IQ</span></span>
             <span className="text-[10px] font-black text-brand-secondary tracking-[0.4em] uppercase">Operating System</span>
           </div>
-        </div>
+        </Link>
 
         <div className="space-y-10 relative z-10">
           <motion.h1 
@@ -107,12 +107,12 @@ export default function Auth() {
           className="w-full max-w-lg glass-panel p-16 bg-white"
         >
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-5 mb-12">
-            <div className="w-12 h-12 rounded-2xl bg-black border border-slate-100 flex items-center justify-center shadow-xl">
+          <Link to="/" className="lg:hidden flex items-center gap-5 mb-12 group cursor-pointer">
+            <div className="w-12 h-12 rounded-2xl bg-black border border-slate-100 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
               <BrainCircuit className="w-7 h-7 text-brand-primary" />
             </div>
-            <span className="font-black text-3xl text-slate-900 tracking-tighter leading-none italic">TRAINER<span className="text-brand-primary">IQ</span></span>
-          </div>
+            <span className="font-black text-3xl text-slate-900 tracking-tighter leading-none italic group-hover:text-brand-primary transition-colors duration-300">TRAINER<span className="text-brand-primary">IQ</span></span>
+          </Link>
 
           <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight italic uppercase">
             {isLogin ? 'SYSTEM AUTH' : 'CREATE NODE'}
