@@ -1,7 +1,7 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from .database import engine, Base
-from .routes import auth, trainers, sessions, ai, dashboard
+from .routes import auth, trainers, sessions, ai, dashboard, requirements, form, evaluation, authenticity, diagnostic
 from .websocket.manager import manager
 from .config import settings
 import random
@@ -31,6 +31,11 @@ app.include_router(trainers.router)
 app.include_router(sessions.router)
 app.include_router(ai.router)
 app.include_router(dashboard.router)
+app.include_router(requirements.router)
+app.include_router(form.router)
+app.include_router(evaluation.router)
+app.include_router(authenticity.router)
+app.include_router(diagnostic.router)
 
 @app.get("/")
 async def root():

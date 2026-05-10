@@ -14,7 +14,7 @@ export default function Layout() {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50 text-slate-900 selection:bg-brand-primary/20 font-poppins">
+    <div className="flex min-h-screen bg-white text-slate-900 selection:bg-brand-primary/20 font-poppins">
       {/* Background Mesh Gradients (Light Mode) */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-brand-primary/5 blur-[120px] animate-orb"></div>
@@ -27,37 +27,37 @@ export default function Layout() {
         <LiveCoachingBanner />
 
         {/* Futuristic Light Header */}
-        <header className="h-20 border-b border-slate-100 bg-white/70 backdrop-blur-md flex items-center justify-between px-10 sticky top-0 z-50">
-          <div className="flex items-center gap-6">
+        <header className="h-24 border-b border-slate-100 bg-white/40 backdrop-blur-3xl flex items-center justify-between px-12 sticky top-0 z-50">
+          <div className="flex items-center gap-8">
             <div className="relative group hidden md:block">
-              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-hover:text-brand-primary transition-colors" />
+              <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-hover:text-brand-primary transition-colors" />
               <input 
                 type="text" 
                 placeholder="Search intelligence..." 
-                className="bg-slate-50 border border-slate-100 rounded-full py-2.5 pl-10 pr-4 text-xs focus:outline-none focus:border-brand-primary/50 w-64 transition-all"
+                className="bg-slate-50 border border-slate-100 rounded-full py-3 pl-12 pr-6 text-[11px] font-black uppercase tracking-widest focus:outline-none focus:border-brand-primary/50 w-80 transition-all shadow-inner"
               />
             </div>
-            <div className="h-4 w-[1px] bg-slate-100 hidden md:block"></div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Neural Sync Active</span>
+            <div className="h-6 w-[1px] bg-slate-100 hidden md:block"></div>
+            <div className="flex items-center gap-3">
+              <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse shadow-lg shadow-green-500/20"></div>
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Neural Sync Active</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-8">
-            <button className="relative p-2 text-slate-400 hover:text-black transition-colors">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-accent rounded-full border-2 border-white"></span>
+          <div className="flex items-center gap-10">
+            <button className="relative p-3 text-slate-400 hover:text-slate-900 transition-colors bg-slate-50 rounded-2xl border border-slate-100 shadow-sm group">
+              <Bell className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+              <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-brand-accent rounded-full border-2 border-white"></span>
             </button>
             
-            <div className="flex items-center gap-4 pl-8 border-l border-slate-100">
+            <div className="flex items-center gap-5 pl-10 border-l border-slate-100">
               <div className="text-right hidden sm:block">
-                <p className="text-xs font-black text-black tracking-tight">{user.name}</p>
+                <p className="text-xs font-black text-slate-900 tracking-tight uppercase italic">{user.name}</p>
                 <p className="text-[9px] text-brand-primary uppercase font-black tracking-widest">{user.role}</p>
               </div>
               <div className="relative group">
-                <div className="relative w-11 h-11 rounded-2xl bg-white shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center justify-center overflow-hidden group-hover:border-brand-primary/40 transition-colors">
-                  <User className="w-5 h-5 text-slate-400 group-hover:text-black transition-colors" />
+                <div className="relative w-14 h-14 rounded-2xl bg-white shadow-2xl shadow-slate-200/50 border border-slate-100 flex items-center justify-center overflow-hidden group-hover:border-brand-primary transition-all">
+                  <User className="w-6 h-6 text-slate-400 group-hover:text-slate-900 transition-colors" />
                 </div>
               </div>
             </div>
@@ -65,7 +65,7 @@ export default function Layout() {
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 p-10 overflow-y-auto custom-scrollbar">
+        <main className="flex-1 p-12 overflow-y-auto custom-scrollbar">
           <div className="max-w-7xl mx-auto space-y-12 animate-in">
             <Outlet />
           </div>
@@ -74,4 +74,3 @@ export default function Layout() {
     </div>
   );
 }
-

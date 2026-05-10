@@ -61,7 +61,10 @@ const ALERTS = [
 export default function IntelligencePreview() {
   const [stats, setStats] = useState<any>(null);
   const [engagement, setEngagement] = useState(91);
-  const [feedIndex, setFeedIndex] = useState(0);
+  const [activeMetric, setActiveMetric] = useState('Engagement');
+  const [chartData, setChartData] = useState(areaData);
+  const [feed, setFeed] = useState<string[]>(FEED_ITEMS);
+  const [alerts, setAlerts] = useState<any[]>(ALERTS);
   const [alertIndex, setAlertIndex] = useState(0);
 
   useEffect(() => {
@@ -69,24 +72,48 @@ export default function IntelligencePreview() {
       try {
         const data = await getDashboardStats();
         setStats(data);
+        if (data.avg_engagement) {
+          setEngagement(data.avg_engagement);
+        }
       } catch (e) {
         console.error(e);
       }
     };
     fetchStats();
 
+    // Fluctuations for visual effect
     const interval = setInterval(() => {
       setEngagement(prev => Math.min(100, Math.max(80, prev + (Math.random() * 4 - 2))));
-      setFeedIndex(prev => (prev + 1) % FEED_ITEMS.length);
     }, 3000);
 
+    // Real-time WebSockets connection to AI Backend
+    const ws = new WebSocket('ws://localhost:8000/ws/coaching');
+    ws.onopen = () => console.log("Connected to AI Coaching Engine WS");
+    
+    ws.onmessage = (event) => {
+      const text = event.data;
+      const colors = ['brand-primary', 'brand-accent', 'brand-secondary'];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      
+      setAlerts(prev => [{ text, color: randomColor }, ...prev].slice(0, 10));
+      setAlertIndex(0); // Show the latest alert
+
+      setFeed(prev => {
+        // Just extract the core message if it starts with "AI Suggestion:"
+        const cleanText = text.replace('AI Suggestion: ', '');
+        return [`⚡ ${cleanText}`, ...prev].slice(0, 5);
+      });
+    };
+
+    // Fallback rotation just in case WS is silent
     const alertInterval = setInterval(() => {
-      setAlertIndex(prev => (prev + 1) % ALERTS.length);
-    }, 5000);
+      setAlertIndex(prev => (prev + 1) % alerts.length);
+    }, 7000);
 
     return () => {
       clearInterval(interval);
       clearInterval(alertInterval);
+      ws.close();
     };
   }, []);
 
@@ -99,7 +126,7 @@ export default function IntelligencePreview() {
         
         {/* Futuristic Background Layers */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+          <div className="absolute inset-0 opacity-20 mix-blend-overlay"></div>
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
           <div className="scan-line opacity-20"></div>
           {/* Neural Particles / Light Streaks */}
@@ -160,9 +187,13 @@ export default function IntelligencePreview() {
 
           {/* Engagement Graph + Waveform */}
           <div className="flex-1 flex flex-col gap-4">
+             <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black text-white uppercase tracking-widest">{activeMetric} Trend</span>
+                <div className="px-3 py-1 rounded-full bg-white/10 text-[8px] font-bold text-white uppercase">Live Sync</div>
+             </div>
              <div className="h-24 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                   <AreaChart data={areaData}>
+                   <AreaChart data={chartData}>
                       <defs>
                         <linearGradient id="heroEngage" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="#00f2ff" stopOpacity={0.4}/>
@@ -212,7 +243,16 @@ export default function IntelligencePreview() {
                <motion.div 
                 key={i}
                 whileHover={{ scale: 1.05, y: -2 }}
-                className="glass-panel p-4 flex flex-col gap-2 group/card border-white/5 hover:border-white/20 transition-all cursor-default overflow-hidden relative"
+                onClick={() => {
+                  setActiveMetric(card.label);
+                  setChartData(Array.from({ length: 7 }).map((_, idx) => ({
+                    time: idx.toString(),
+                    val: Math.floor(Math.random() * 30) + 70
+                  })));
+                  setAlerts(prev => [{ text: `Analyzing detailed ${card.label} patterns...`, color: 'brand-primary' }, ...prev].slice(0, 10));
+                  setAlertIndex(0);
+                }}
+                className={`glass-panel p-4 flex flex-col gap-2 group/card border-white/5 hover:border-white/20 transition-all cursor-pointer overflow-hidden relative ${activeMetric === card.label ? 'ring-2 ring-white/20 bg-white/10' : ''}`}
                >
                  <div className="absolute -right-2 -bottom-2 opacity-5 group-hover/card:opacity-10 transition-opacity">
                     <card.icon className="w-12 h-12" style={{ color: card.color }} />
@@ -249,20 +289,20 @@ export default function IntelligencePreview() {
                   <div className="w-1.5 h-1.5 rounded-full bg-brand-primary animate-ping"></div>
                   AI Co-Pilot Feedback
                 </h3>
-                <div className="space-y-3 flex-1">
+                 <div className="space-y-3 flex-1">
                    <AnimatePresence mode="wait">
                       <motion.div
-                        key={feedIndex}
+                        key={feed[0]} // re-animate on new item
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 10 }}
                         className="text-xs font-bold text-slate-300 flex items-center gap-2"
                       >
-                         <span className="text-brand-primary">✓</span> {FEED_ITEMS[feedIndex]}
+                         <span className="text-brand-primary"></span> {feed[0]}
                       </motion.div>
                    </AnimatePresence>
                    <div className="space-y-1 opacity-40">
-                      {FEED_ITEMS.filter((_, i) => i !== feedIndex).slice(0, 3).map((item, i) => (
+                      {feed.slice(1, 4).map((item, i) => (
                         <div key={i} className="text-[10px] font-medium text-slate-500">{item}</div>
                       ))}
                    </div>
@@ -295,23 +335,25 @@ export default function IntelligencePreview() {
 
           {/* Floating AI Alerts */}
           <div className="absolute -right-8 top-1/2 -translate-y-1/2 hidden xl:flex flex-col gap-4 pointer-events-none">
-             <AnimatePresence>
-               <motion.div
-                 key={alertIndex}
-                 initial={{ opacity: 0, x: 20, scale: 0.9 }}
-                 animate={{ opacity: 1, x: 0, scale: 1 }}
-                 exit={{ opacity: 0, x: -20, scale: 0.9 }}
-                 className={`p-4 rounded-2xl glass-panel border-${ALERTS[alertIndex].color}/30 bg-${ALERTS[alertIndex].color}/10 backdrop-blur-xl w-64 shadow-2xl`}
-               >
-                  <div className="flex gap-3 items-center">
-                     <div className={`w-8 h-8 rounded-full bg-black flex items-center justify-center border border-white/10`}>
-                        <AlertCircle className={`w-4 h-4 text-${ALERTS[alertIndex].color}`} />
-                     </div>
-                     <p className="text-[10px] font-black text-white uppercase tracking-tight leading-tight">
-                        {ALERTS[alertIndex].text}
-                     </p>
-                  </div>
-               </motion.div>
+             <AnimatePresence mode="wait">
+               {alerts.length > 0 && (
+                 <motion.div
+                   key={alerts[alertIndex].text + alertIndex}
+                   initial={{ opacity: 0, x: 20, scale: 0.9 }}
+                   animate={{ opacity: 1, x: 0, scale: 1 }}
+                   exit={{ opacity: 0, x: -20, scale: 0.9 }}
+                   className={`p-4 rounded-2xl glass-panel border-${alerts[alertIndex].color}/30 bg-${alerts[alertIndex].color}/10 backdrop-blur-xl w-64 shadow-2xl`}
+                 >
+                    <div className="flex gap-3 items-center">
+                       <div className={`w-8 h-8 rounded-full bg-black flex items-center justify-center border border-white/10`}>
+                          <AlertCircle className={`w-4 h-4 text-${alerts[alertIndex].color}`} />
+                       </div>
+                       <p className="text-[10px] font-black text-white uppercase tracking-tight leading-tight">
+                          {alerts[alertIndex].text}
+                       </p>
+                    </div>
+                 </motion.div>
+               )}
              </AnimatePresence>
           </div>
         </div>

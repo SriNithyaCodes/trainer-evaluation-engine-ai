@@ -8,6 +8,10 @@ from typing import List
 
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
+@router.get("/")
+def dashboard_root():
+    return {"status": "Dashboard API is operational"}
+
 @router.get("/stats", response_model=DashboardStats)
 def get_stats(db: Session = Depends(get_db)):
     total_trainers = db.query(Trainer).count()
